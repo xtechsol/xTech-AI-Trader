@@ -26,11 +26,13 @@ class AIModel:
         self.scaler = StandardScaler()
 
     def prepare_data(self, market_data, sentiment):
-        features = market_data[['Open', 'High', 'Low', 'Close', 'Volume']].values
+        # For Solana, we might not have 'Open', 'High', 'Low' like in traditional markets,
+        # so we'd use the price changes or volume for features.
+        features = market_data[['Price']].diff().fillna(0).values
         features = self.scaler.fit_transform(features)
         sentiment_array = np.full((features.shape[0], 1), sentiment)
         X = np.hstack((features, sentiment_array))
-        y = (market_data['Close'].shift(-1) > market_data['Close']).astype(int).values[:-1]  # Predict if price will go up
+        y = (market_data['Price'].shift(-1) > market_data['Price']).astype(int).values[:-1]
         return train_test_split(X, y, test_size=0.2, random_state=42)
 
     def train_model(self, X_train, X_test, y_train, y_test):
@@ -78,7 +80,7 @@ class AIModel:
 if __name__ == "__main__":
     collector = DataCollector(load_config())
     ai = AIModel(collector)
-    market_data, sentiment = collector.collect_data(['BTC-USD'])
+    market_data, sentiment = collector.collect_data()
     X_train, X_test, y_train, y_test = ai.prepare_data(market_data, sentiment)
     ai.train_model(X_train, X_test, y_train, y_test)
     prediction = ai.predict(X_test[0])

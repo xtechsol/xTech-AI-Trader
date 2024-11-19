@@ -17,5 +17,3 @@ try:
 except:
     print("Error during authentication")
 
-
-# hidden for security measures

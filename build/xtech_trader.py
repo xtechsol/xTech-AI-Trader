@@ -7,35 +7,44 @@ import os
 from transformers import pipeline  # For AI text generation
 import torch
 
+from token_purchase_tweeter import TokenPurchaseTweeter
+
 class XTechTrader:
+    # ... (rest of the class remains the same)
+
     def __init__(self):
-        # Twitter authentication
-        self.auth = tweepy.OAuthHandler(os.environ['TWITTER_CONSUMER_KEY'], os.environ['TWITTER_CONSUMER_SECRET'])
-        self.auth.set_access_token(os.environ['TWITTER_ACCESS_TOKEN'], os.environ['TWITTER_ACCESS_TOKEN_SECRET'])
-        self.api = tweepy.API(self.auth)
+        # ... (previous initialization)
+        self.token_tweeter = TokenPurchaseTweeter()  # Initialize the tweeting class
 
-        # Solana client setup
-        self.solana_client = Client("https://api.mainnet-beta.solana.com")
-        
-        # Phantom wallet setup
-        self.wallet = PhantomWallet(os.environ['PHANTOM_PRIVATE_KEY'])
-        self.deployer_wallet = PublicKey("Geze5FwmcHTnkW3uDw1rXVeKytHRGQ7KYawnSZ3hKvAE")
+    def buy_token(self, token_address, amount_in_sol):
+        transaction = self.wallet.create_transaction(
+            program_id=token_address,
+            instruction_data={'action': 'buy', 'amount': amount_in_sol},
+            from_wallet=self.deployer_wallet
+        )
+        result = self.solana_client.send_transaction(transaction)
+        if result['result']:
+            # Assume tokens_received is calculated or returned from the transaction
+            tokens_received = self.calculate_tokens_received(token_address, amount_in_sol)
+            # Get the AI's reasoning from wherever it's stored or decided
+            reason = self.get_AI_reason_for_buy(token_address)
+            self.token_tweeter.tweet_purchase(
+                token_address, 
+                amount_in_sol, 
+                tokens_received, 
+                reason
+            )
+        return result
 
-        # AI Model for decision making
-        self.ai_model = pipeline("text-generation", model="EleutherAI/gpt-neo-2.7B")  # Example model
+    def calculate_tokens_received(self, token_address, amount_in_sol):
+        # This would be a placeholder for real logic that interacts with the blockchain to determine token amount
+        # For demonstration, we'll use a simple conversion rate
+        token_price_in_sol = 0.001  # Example price
+        return int(amount_in_sol / token_price_in_sol)
 
-    def tweet(self, message):
-        self.api.update_status(message)
-
-    def get_AI_action(self, context):
-        """Use AI to decide the next action based on context."""
-        prompt = f"Given the current market context: {context}\nDecide the best action for xTechTrader: "
-        generated_text = self.ai_model(prompt, max_length=100, num_return_sequences=1)[0]['generated_text']
-        # Extract the action from the generated text
-        action = generated_text.split("Action: ")[1].split("\n")[0].lower()
-        if action not in ["create", "buy", "sell", "burn", "send"]:
-            return "do_nothing"  # Fallback if AI suggests an invalid action
-        return action
+    def get_AI_reason_for_buy(self, token_address):
+        # Placeholder for getting the AI's reasoning
+        return "AI detected an undervalued asset with high growth potential."
 
     def execute_action(self, action, **kwargs):
         """Execute the action decided by AI."""

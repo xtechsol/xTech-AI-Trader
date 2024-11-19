@@ -1,6 +1,15 @@
 import tweepy
 import os
 
+from setuptools import setup, find_packages
+
+setup(
+    name='xTechTrader',
+    version='1.0',
+    packages=find_packages(),
+    install_requires=[
+        'tweepy']
+
 class TokenPurchaseTweeter:
     def __init__(self):
         # Twitter authentication

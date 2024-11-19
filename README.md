@@ -20,5 +20,5 @@
 
 ### Installation
 
-git clone [git@github.com:yourusername/xTech-AI-Trader.git](https://github.com/xtechsol/xTech-AI-Trader/edit/main/README.md)
+[git@github.com:yourusername/xTech-AI-Trader.git](https://github.com/xtechsol/xTech-AI-Trader/edit/main/README.md)
 cd xTech-AI-Trader

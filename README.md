@@ -22,22 +22,3 @@
 
 git clone [git@github.com:yourusername/xTech-AI-Trader.git](https://github.com/xtechsol/xTech-AI-Trader/edit/main/README.md)
 cd xTech-AI-Trader
-
-xTech-AI-Trader/
-├── .gitignore
-├── README.md
-├── requirements.txt
-├── src/
-│   ├── __init__.py
-│   ├── xtech/
-│   │   ├── __init__.py
-│   │   ├── model.py
-│   │   ├── twitter_integration.py
-│   │   ├── web3_integration.py
-│   │   └── pump_fun.py
-│   └── main.py
-├── data/
-│   └── sample_tweets.json
-└── tests/
-    ├── __init__.py
-    └── test_xtech.py
